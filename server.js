@@ -2,13 +2,12 @@ require('dotenv').config();
 
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
 const pool = require('./config/connectionPool');
 const PORT = process.env.PORT || 4000;
 
 // HTTP body에 전달되는 json 데이터 처리를 위한 미들웨어
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 app.get('/', (req, res) => {
@@ -55,10 +54,44 @@ app.get('/post/:no', (req, res) => {
                     : res.send(data[0]);
             }
         })
+
         // 커넥션 반납
         conn.release();
     })
 })
+
+// 게시글 작성
+app.post('/post', (req, res) => {
+    const {title, contents} = req?.body;
+
+    // 커넥션 플 생성
+    pool((conn) => {
+        const sql = "INSERT INTO board_tbl VALUES (DEFAULT, ?, ?, DEFAULT)"
+
+        // 쿼리 실행
+        conn.query(sql, [title, contents], (err, data) => {
+            if (err) { // 쿼리 실행이 실패한 경우 에러 코드와 메세지 출력
+                console.error(`Error Code : ${err.code}`);
+                console.error(`Error Message : ${err.message}`);
+                res.send({ // 에러 코드 및 메세지, 결과 전송
+                    code: err.code,
+                    message: err.message,
+                    result: false
+                })
+            } else {// 쿼리 실행이 성공한 경우
+                console.log(data)
+                res.send({ // 작성한 게시글 번호 및 결과 전송
+                    no: data.insertId,
+                    result: true
+                })
+            }
+        })
+
+        // 커넥션 반납
+        conn.release();
+    })
+})
+
 
 // 해당 포트로 서버 실행
 app.listen(PORT, () => {
