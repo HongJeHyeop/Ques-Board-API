@@ -3,11 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const pool = require('./config/connectionPool');
+const searchRouter = require('./routes/search');
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use('/search', searchRouter);
 
 app.get('/', (req, res) => {
     console.log('=== Ques Board API 접속 ===');
@@ -92,8 +93,8 @@ app.post('/post', (req, res) => {
 })
 
 // 게시글 삭제
-app.delete('/post', (req, res) => {
-    const no = req.body?.no;
+app.delete('/post/:no', (req, res) => {
+    const no = req.params?.no;
     console.log('삭제할 게시글 번호 : ' + no);
 
     // 커넥션 풀 생성
@@ -121,8 +122,17 @@ app.delete('/post', (req, res) => {
                     })
             }
         })
+
+        // 커넥션 반납
+        conn.release();
     })
 })
+
+// 지정된 경로 이외의 요청 처리
+app.use(function(req, res) {
+    res.status(404).send('요청하신 경로를 찾을수 없습니다.');
+});
+
 
 
 // 해당 포트로 서버 실행
