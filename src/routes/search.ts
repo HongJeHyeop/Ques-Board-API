@@ -1,30 +1,31 @@
-const express = require('express');
-const pool = require('../config/connectionPool');
-const router = express.Router();
+import express, { Router, Request, Response } from "express";
+import { pool } from '../config/connectionPool';
+import { PoolConnection, QueryError } from "mysql2";
 
+const router:Router = express.Router();
 
 // 제목으로 게시글 검색
-router.get('/title', (req, res) => {
-    const {title} = req.body;
-    const sql = "SELECT * FROM board_tbl WHERE title LIKE CONCAT ('%', ?, '%')"; // 제목에 검색어가 포함되어 있는 게시물 찾기
+router.get('/title', (req: Request, res: Response) => {
+    const title: string  = req.body.title;
+    const sql: string = "SELECT * FROM board_tbl WHERE title LIKE CONCAT ('%', ?, '%')"; // 제목에 검색어가 포함되어 있는 게시물 찾기
 
     // 커넥션 풀 생성 후 쿼리 전송
     pool((conn) => executeSearchQuery('/title', res, conn, sql, title));
 })
 
 // 내용으로 게시글 검색
-router.get('/contents', (req, res) => {
-    const {contents} = req.body;
-    const sql = "SELECT * FROM board_tbl WHERE contents LIKE CONCAT ('%', ?, '%')"; // 내용에 검색어가 포함되어 있는 게시물 찾기
+router.get('/contents', (req: Request, res: Response) => {
+    const contents: string = req.body.contents;
+    const sql: string = "SELECT * FROM board_tbl WHERE contents LIKE CONCAT ('%', ?, '%')"; // 내용에 검색어가 포함되어 있는 게시물 찾기
 
     // 커넥션 풀 생성 후 쿼리 전송
     pool((conn) => executeSearchQuery('/contents', res, conn, sql, contents));
 })
 
 // 작성일시(기간)으로 검색
-router.get('/date', (req, res) => {
-    const {startDateTime, endDateTime} = req.body;
-    const sql = "SELECT * FROM board_tbl WHERE writeDate BETWEEN ? AND ?";
+router.get('/date', (req: Request, res: Response) => {
+    const { startDateTime, endDateTime }: { startDateTime: string, endDateTime: string } = req.body;
+    const sql: string = "SELECT * FROM board_tbl WHERE writeDate BETWEEN ? AND ?";
 
     if (checkDateTime(startDateTime) && checkDateTime(endDateTime)) { // 날짜형식 검사
         // 커넥션 풀 생성 후 쿼리 전송
@@ -35,10 +36,10 @@ router.get('/date', (req, res) => {
 })
 
 // 정규식을 이용한 날짜 형식 검사
-const checkDateTime = (date) => {
-    let result = false;
+const checkDateTime = (date: string): boolean => {
+    let result: boolean = false;
     // 날짜 형식 YYYY-MM-DD hh:mm 중 시, 분 생략 가능
-    const patterns = [
+    const patterns: RegExp[] = [
         /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):([0-5][0-9])/, // YYYY-MM-DD hh:mm
         /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9])/, // YYYY-MM-DD hh
         /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/ // YYYY-MM-DD
@@ -52,9 +53,9 @@ const checkDateTime = (date) => {
 }
 
 // 게시글 검색 쿼리실행 메서드
-const executeSearchQuery = (path, res, conn, sql, search) => {
+const executeSearchQuery = (path: string, res: Response, conn: PoolConnection, sql: string, search: string | string[]): void => {
     // 쿼리 실행
-    conn.query(sql, search, (err, data) => {
+    conn.query(sql, search, (err: QueryError | null, data: any) => {
         if (err) { // 쿼리 실행이 실패한 경우 에러 코드와 메세지 출력
             console.error(`[GET /search${path}] Error Code : ${err.code}`);
             console.error(`[GET /search${path}] Error Message : ${err.message}`);

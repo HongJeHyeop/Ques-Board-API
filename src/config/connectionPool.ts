@@ -1,18 +1,18 @@
-const mysql = require('mysql2');
+import mysql, { PoolConnection } from 'mysql2';
 
 // .env에 저장되어있는 mysql정보를 가지고 와서 pool 생성
-const pool = mysql.createPool({
+const connectionPool = mysql.createPool({
     host    : process.env.MYSQL_HOST,
-    port    : process.env.MYSQL_PORT,
+    port    : parseInt(process.env.MYSQL_PORT || "3306"),
     user    : process.env.MYSQL_USER,
     password: process.env.MYSQL_PASS,
     database: process.env.MYSQL_DB,
     charset : process.env.MYSQL_CHARSET
 })
 
-module.exports = (callback) => {
+export function pool(callback: (conn: PoolConnection) => void ) {
     // 커넥션 획득
-    pool.getConnection((err, conn) => {
+    connectionPool.getConnection((err:NodeJS.ErrnoException | null, conn: PoolConnection): void => {
         if (err) { // 연결 실패시 에러 코드와 메세지 출력
             console.error('MySQL Connection Failed');
             console.error(`Error Code : ${err.code}`);

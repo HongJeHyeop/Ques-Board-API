@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2016",                                  /* 컴파일된 JavaScript의 ECMAScript 버전을 설정 */
+    "module": "commonjs",                                /* 모듈 포멧 설정 */
+    "outDir": "./dist",                                  /* 컴파일된 JavaScript파일 저장 위치 지정*/
+    "rootDir": "./",                                     /* TypeScript 소스 파일의 루트 폴더를 지정 */
+    "moduleResolution": "node",                          /* 모듈 해결 방식을 node.js 사용 */
+    "esModuleInterop": true,                             /* import 문과 require 문을 혼용하여 사용할 때 발생하는 문제 해결 */
+    "forceConsistentCasingInFileNames": true,            /* 모듈 및 파일 이름의 대소문자 일관성을 유지 */
+    "strict": true,                                      /* 엄격한 타입 체크 옵션 활성화 */
+    "skipLibCheck": true                                 /* .d.ts 확장자를 가진 TypeScript 선언 파일에 대한 타입 체크를 skip */
+  }
+}
