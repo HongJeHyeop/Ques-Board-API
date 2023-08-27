@@ -17,6 +17,7 @@ router.get('/contents', (req, res) => {
     const {contents} = req.body;
     const sql = "SELECT * FROM board_tbl WHERE contents LIKE CONCAT ('%', ?, '%')"; // 내용에 검색어가 포함되어 있는 게시물 찾기
 
+    // 커넥션 풀 생성 후 쿼리 전송
     pool((conn) => executeSearchQuery('/contents', res, conn, sql, contents));
 })
 
@@ -26,6 +27,7 @@ router.get('/date', (req, res) => {
     const sql = "SELECT * FROM board_tbl WHERE writeDate BETWEEN ? AND ?";
 
     if (checkDateTime(startDateTime) && checkDateTime(endDateTime)) { // 날짜형식 검사
+        // 커넥션 풀 생성 후 쿼리 전송
         pool((conn) => executeSearchQuery('/date', res, conn, sql, [startDateTime, endDateTime]));
     } else {
         res.status(400).send('잘못된 날짜 형식입니다');
