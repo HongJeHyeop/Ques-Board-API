@@ -2,7 +2,7 @@ import express, { Router, Request, Response } from "express";
 import { pool } from '../config/connectionPool';
 import { PoolConnection, QueryError } from "mysql2";
 
-const router:Router = express.Router();
+const router: Router = express.Router();
 
 // 제목으로 게시글 검색
 router.get('/title', (req: Request, res: Response) => {

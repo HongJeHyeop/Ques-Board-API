@@ -13,13 +13,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/search', require('./routes/search'));
 
-app.get('/', (req: Request, res: Response): void => {
+app.get('/', (req: Request, res: Response) => {
     console.log('=== Ques Board API 접속 ===');
     res.send('Success!');
+
 })
 
 // 전체 게시글 조회
-app.get('/posts', (req: Request, res: Response): void => {
+app.get('/posts', (req: Request, res: Response) => {
     // 커넥션 풀 생성
     pool((conn) => {
         const sql: string = "SELECT * FROM board_tbl";
@@ -91,7 +92,7 @@ app.post('/post', (req: Request, res: Response) => {
 })
 
 // 게시글 삭제
-app.delete('/post/:no', (req:Request, res:Response) => {
+app.delete('/post/:no', (req: Request, res: Response) => {
     const no: string = req.params.no;
     console.log(`[DELETE /post] 삭제할 게시글 번호 : ${no}`);
 
